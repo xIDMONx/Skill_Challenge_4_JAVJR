@@ -1,5 +1,6 @@
 package com.metaphorce.challenge.controllers;
 
+import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -33,7 +34,19 @@ public class TareaController {
      */
     @PostMapping
     public ResponseEntity<Tarea> createTarea(@RequestBody Tarea tarea) {
-        return new ResponseEntity<>(tareaService.saveTarea(tarea), HttpStatus.CREATED);
+        try {
+            if (tarea.getTitulo() == null || tarea.getTitulo().isEmpty()) {
+                throw new InvalidTareaDataException("El titulo de la tarea no puede estar vacío.", "INVALID_TAREA_TITULO", HttpStatus.BAD_REQUEST, null);
+            }
+            if (tarea.getDescripcion() == null || tarea.getDescripcion().isEmpty()) {
+                throw new InvalidTareaDataException("La descripción de la tarea no puede estar vacío.", "INVALID_TAREA_DESCRIPCION", HttpStatus.BAD_REQUEST, null);
+            }
+
+            return new ResponseEntity<>(tareaService.saveTarea(tarea), HttpStatus.CREATED);
+
+        } catch (InvalidTareaDataException e) {
+            return new ResponseEntity<>(e.getHttpStatus());
+        }
     }
 
     /**
