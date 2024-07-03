@@ -1,39 +1,38 @@
 package com.metaphorce.challenge;
 
 import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
-import com.metaphorce.challenge.exceptions.TareaNotFoudException;
 import com.metaphorce.challenge.models.Tarea;
 import com.metaphorce.challenge.repositories.TareaRepository;
 import com.metaphorce.challenge.services.TareaService;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.any;
+
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.*;
 
 public class TareaServiceTest {
 
+    @InjectMocks
     private TareaService tareaService;
-    private TareaRepository tareaRepositoryMock;
+    @Mock
+    private TareaRepository tareaRepository;
 
     @BeforeEach
-    public void init() {
-        tareaRepositoryMock = mock(TareaRepository.class);
-        tareaService = new TareaService(tareaRepositoryMock);
+    public void setUp() {
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
@@ -46,11 +45,11 @@ public class TareaServiceTest {
         tarea.setEstado("Pendiente");
         tarea.setFechaVencimiento(new Date());
         // Predefinimos la respuesta del método save de tareaRepositoryMock para que devuelva la misma tarea
-        when(tareaRepositoryMock.save(tarea)).thenReturn(tarea);
+        when(tareaRepository.save(tarea)).thenReturn(tarea);
         // Llamamos al método saveTarea del tareaService con la tarea como argumento y almacenamos el resultado en tareaCreada
         Tarea tareaCreada = tareaService.saveTarea(tarea);
         // Verificamos con Mockito que el método save del tareaRepositoryMock se ha llamado exactamente una vez con la tarea como argumento
-        Mockito.verify(tareaRepositoryMock, times(1)).save(tarea);
+        verify(tareaRepository, times(1)).save(tarea);
         // Verificamos que la tareaCreada que se obtuvo de tareaService.saveTarea(tarea) sea la misma que la tarea original
         assertEquals(tarea, tareaCreada);
     }
@@ -62,11 +61,11 @@ public class TareaServiceTest {
         // Asignamos algunas propiedades
         tarea.setId(1L);
         // Predefinimos la respuesta del método findById de tareaRepositoryMock para que devuelva la misma tarea
-        when(tareaRepositoryMock.findById(1L)).thenReturn(Optional.of(tarea));
+        when(tareaRepository.findById(1L)).thenReturn(Optional.of(tarea));
         //
         Tarea tareaServiceTareaById = tareaService.getTareaById(1L);
         //
-        Mockito.verify(tareaRepositoryMock, times(1)).findById(1L);
+        verify(tareaRepository, times(1)).findById(1L);
         //
         assertEquals(tarea, tareaServiceTareaById);
     }
@@ -79,29 +78,24 @@ public class TareaServiceTest {
         tarea.setId(1L);
         tarea.setTitulo("Test Titulo");
         //
-        when(tareaRepositoryMock.findById(1L)).thenReturn(Optional.of(tarea));
-        when(tareaRepositoryMock.save(any(Tarea.class))).thenReturn(tarea);
+        when(tareaRepository.findById(1L)).thenReturn(Optional.of(tarea));
+        when(tareaRepository.save(any(Tarea.class))).thenReturn(tarea);
         //
         tarea.setTitulo("Actualizar Titulo");
         Tarea tareaActualizada = tareaService.updateTarea(tarea);
         //
-        Mockito.verify(tareaRepositoryMock, times(1)).save(tarea);
+        verify(tareaRepository, times(1)).save(tarea);
         //
         assertEquals("Actualizar Titulo", tareaActualizada.getTitulo());
     }
 
     @Test
     public void testDeleteTarea() {
-        //
-        Tarea tarea = new Tarea();
-        //
-        tarea.setId(1L);
-        //
-        when(tareaRepositoryMock.findById(1L)).thenReturn(Optional.of(tarea));
+        willDoNothing().given(tareaRepository).deleteById(1L);
         //
         tareaService.deleteTarea(1L);
         //
-        Mockito.verify(tareaRepositoryMock, times(1)).delete(tarea);
+        verify(tareaRepository, times(1)).deleteById(1L);
     }
 
     @Test
@@ -122,7 +116,7 @@ public class TareaServiceTest {
      */
     @Test
     public void testFindTareaByNonExistentId() {
-        when(tareaRepositoryMock.findById(99L)).thenReturn(Optional.empty());
+        when(tareaRepository.findById(99L)).thenReturn(Optional.empty());
         //
         Tarea tarea = tareaService.getTareaById(99L);
         //
