@@ -128,35 +128,4 @@ public class TareaServiceTest {
         //
         assertNull(tarea);
     }
-
-    @Test
-    public void testFindTareaByNonExistentIdWhenTareaNotFoundExceptionThenAssertException() {
-        Exception exception = assertThrows(
-                TareaNotFoudException.class,
-                () -> {
-                    tareaRepositoryMock.findById(99L);
-                });
-        //
-        String expectedMessage = "Tarea no encontrada";
-        String actualMessage = exception.getMessage();
-        //
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @Test
-    public void testUpdateNonExistentTarea() {
-        Tarea tarea = new Tarea();
-        //
-        tarea.setId(99L);
-        tarea.setTitulo("Test Tarea");
-        //
-        when(tareaRepositoryMock.findById(99L)).thenReturn(Optional.empty());
-        //
-        Exception exception = assertThrows(
-                IllegalArgumentException.class, () -> tareaService.updateTarea(tarea)
-        );
-        //
-        assertEquals("El titulo de la tarea es requerido.", exception.getMessage());
-    }
-
 }

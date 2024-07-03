@@ -1,8 +1,11 @@
 package com.metaphorce.challenge.services;
 
-import org.springframework.stereotype.Service;
+import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
 import com.metaphorce.challenge.models.Tarea;
 import com.metaphorce.challenge.repositories.TareaRepository;
+
+import org.springframework.stereotype.Service;
+
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -28,6 +31,9 @@ public class TareaService {
      */
     @Transactional
     public Tarea saveTarea(Tarea tarea) {
+        if (tarea.getTitulo() == null || tarea.getTitulo().trim().isEmpty())
+            throw new InvalidTareaDataException("El titulo de la tarea es requerido.");
+
         return tareaRepository.save(tarea);
     }
 
@@ -52,6 +58,9 @@ public class TareaService {
      */
     @Transactional
     public Tarea updateTarea(Tarea tarea) {
+        if (tarea.getTitulo() == null || tarea.getTitulo().trim().isEmpty())
+            throw new InvalidTareaDataException("El titulo de la tarea es requerido.");
+
         return tareaRepository.save(tarea);
     }
 
