@@ -4,17 +4,18 @@ import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
 import com.metaphorce.challenge.models.Tarea;
 import com.metaphorce.challenge.repositories.TareaRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TareaService {
 
-    private final TareaRepository tareaRepository;
+    @Autowired
+    private TareaRepository tareaRepository;
 
     /**
      * La clase TareaService proporciona operaciones para interactuar con TareaRepository.
