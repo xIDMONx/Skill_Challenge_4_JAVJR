@@ -1,6 +1,8 @@
 package com.metaphorce.challenge.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,10 +16,16 @@ public class Tarea {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El titulo de la tarea es requerido.")
     private String titulo;
+
+    @NotBlank(message = "La descripción de la tarea es requerido.")
     private String descripcion;
+
+    @NotBlank(message = "El estado de la tarea es requerido.")
     private String estado;
 
+    @NotNull(message = "La fecha de vencimiento de la tarea es requerida.")
     @Column(name = "fecha_vencimiento")
     @Temporal(TemporalType.DATE)
     private Date fechaVencimiento;
