@@ -23,6 +23,12 @@ public class InvalidTareaDataException extends RuntimeException {
      */
     private BindingResult bindingResult;
 
+    public InvalidTareaDataException(String mensaje, String codigo, HttpStatus httpStatus) {
+        super(mensaje);
+        this.codigo = codigo;
+        this.httpStatus = httpStatus;
+    }
+
     public InvalidTareaDataException(String mensaje, String codigo, HttpStatus httpStatus, BindingResult bindingResult) {
         super(mensaje);
         this.codigo = codigo;
@@ -47,6 +53,9 @@ public class InvalidTareaDataException extends RuntimeException {
     }
 
     public BindingResult getBindingResult() {
+        if (this.bindingResult == null) {
+            return null;
+        }
         return bindingResult;
     }
 

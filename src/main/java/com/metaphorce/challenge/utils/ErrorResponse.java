@@ -1,6 +1,7 @@
 package com.metaphorce.challenge.utils;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * La clase ErrorResponse representa un objeto de respuesta utilizado para encapsular información de error.
@@ -42,7 +43,11 @@ public class ErrorResponse {
     }
 
     public List<String> getErrores() {
-        return errores;
+        if (this.errores == null || this.errores.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return this.errores;
     }
 
     public void setErrores(List<String> errores) {
