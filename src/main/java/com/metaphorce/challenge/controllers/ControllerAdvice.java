@@ -21,10 +21,10 @@ public class ControllerAdvice {
         List<String> errores = e.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(FieldError::getDefaultMessage)
-                .toList();
+                .map(FieldError::getDefaultMessage).toList();
 
         ErrorResponse errorResponse = new ErrorResponse(e.getCodigo(), e.getMessage(), errores);
+//        ErrorResponse errorResponse = new ErrorResponse(e.getCodigo(), e.getMessage());
 
         return new ResponseEntity<>(errorResponse, e.getHttpStatus());
     }

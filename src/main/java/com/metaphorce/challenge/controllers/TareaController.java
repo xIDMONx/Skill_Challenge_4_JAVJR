@@ -1,17 +1,26 @@
 package com.metaphorce.challenge.controllers;
 
-import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
+import com.metaphorce.challenge.exceptions.TareaNotFoudException;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.Validator;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.metaphorce.challenge.models.Tarea;
 import com.metaphorce.challenge.services.TareaService;
+import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tarea")
@@ -33,20 +42,17 @@ public class TareaController {
      * @return una ResponseEntity que contiene la Tarea creada y un código de estado de 201 (CREADO)
      */
     @PostMapping
-    public ResponseEntity<Tarea> createTarea(@RequestBody Tarea tarea) {
-        try {
-            if (tarea.getTitulo() == null || tarea.getTitulo().isEmpty()) {
-                throw new InvalidTareaDataException("El titulo de la tarea no puede estar vacío.", "INVALID_TAREA_TITULO", HttpStatus.BAD_REQUEST, null);
-            }
-            if (tarea.getDescripcion() == null || tarea.getDescripcion().isEmpty()) {
-                throw new InvalidTareaDataException("La descripción de la tarea no puede estar vacío.", "INVALID_TAREA_DESCRIPCION", HttpStatus.BAD_REQUEST, null);
-            }
-
-            return new ResponseEntity<>(tareaService.saveTarea(tarea), HttpStatus.CREATED);
-
-        } catch (InvalidTareaDataException e) {
-            return new ResponseEntity<>(e.getHttpStatus());
+    public ResponseEntity<Tarea> createTarea(@Valid @RequestBody Tarea tarea, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new InvalidTareaDataException(
+                    Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage(),
+                    "INVALID_TAREA_DATA",
+                    HttpStatus.BAD_REQUEST,
+                    bindingResult
+            );
         }
+
+        return new ResponseEntity<>(tareaService.saveTarea(tarea), HttpStatus.CREATED);
     }
 
     /**
@@ -68,10 +74,11 @@ public class TareaController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Tarea> getTareaById(@PathVariable Long id) {
-        Optional<Tarea> optionalTarea = tareaService.getTareaById(id);
-
-        return optionalTarea.map(tarea -> new ResponseEntity<>(tarea, HttpStatus.OK))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Tarea tarea = tareaService.getTareaById(id);
+        if (tarea == null) {
+            throw new TareaNotFoudException("Tarea no encontrada", "DB-404", HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(tarea);
     }
 
     /**
@@ -84,29 +91,30 @@ public class TareaController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Tarea> updateTarea(@PathVariable Long id, @RequestBody Tarea updateTarea) {
-        return tareaService.getTareaById(id)
-                .map(existingTarea -> {
-                    if (updateTarea.getTitulo() != null && !updateTarea.getTitulo().isEmpty()) {
-                        existingTarea.setTitulo(updateTarea.getTitulo());
-                    }
+        Tarea existingTarea = tareaService.getTareaById(id);
+        if (existingTarea == null) {
+            throw new TareaNotFoudException("Tarea no encontrada", "DB-404", HttpStatus.NOT_FOUND);
+        }
 
-                    if (updateTarea.getDescripcion() != null && !updateTarea.getDescripcion().isEmpty()) {
-                        existingTarea.setDescripcion(updateTarea.getDescripcion());
-                    }
+        if (updateTarea.getTitulo() != null && !updateTarea.getTitulo().isEmpty()) {
+            existingTarea.setTitulo(updateTarea.getTitulo());
+        }
 
-                    if (updateTarea.getEstado() != null) {
-                        existingTarea.setEstado(updateTarea.getEstado());
-                    }
+        if (updateTarea.getDescripcion() != null && !updateTarea.getDescripcion().isEmpty()) {
+            existingTarea.setDescripcion(updateTarea.getDescripcion());
+        }
 
-                    if (updateTarea.getFechaVencimiento() != null) {
-                        existingTarea.setFechaVencimiento(updateTarea.getFechaVencimiento());
-                    }
+        if (updateTarea.getEstado() != null) {
+            existingTarea.setEstado(updateTarea.getEstado());
+        }
 
-                    existingTarea.setUpdatedAt(new Date());
+        if (updateTarea.getFechaVencimiento() != null) {
+            existingTarea.setFechaVencimiento(updateTarea.getFechaVencimiento());
+        }
 
-                    return new ResponseEntity<>(tareaService.updateTarea(existingTarea), HttpStatus.OK);
-                })
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        existingTarea.setUpdatedAt(new Date());
+
+        return new ResponseEntity<>(tareaService.updateTarea(existingTarea), HttpStatus.OK);
     }
 
     /**
@@ -118,7 +126,7 @@ public class TareaController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTarea(@PathVariable Long id) {
-        if (tareaService.getTareaById(id).isPresent()) {
+        if (tareaService.getTareaById(id) != null) {
             tareaService.deleteTarea(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {

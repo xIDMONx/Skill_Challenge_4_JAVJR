@@ -31,14 +31,8 @@ public class TareaService {
         return tareaRepository.save(tarea);
     }
 
-    /**
-     * Recupera una Tarea por su ID.
-     *
-     * @param id el ID de la Tarea a recuperar
-     * @return un Opcional que contiene la Tarea con el ID dado, o un Opcional vacío si no existe dicha Tarea
-     */
-    public Optional<Tarea> getTareaById(Long id) {
-        return tareaRepository.findById(id);
+    public Tarea getTareaById(Long id) {
+        return tareaRepository.findById(id).orElse(null);
     }
 
     /**
