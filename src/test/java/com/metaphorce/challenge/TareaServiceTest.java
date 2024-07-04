@@ -17,8 +17,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
@@ -84,7 +82,7 @@ public class TareaServiceTest {
         // Actualizamos el título
         tarea.setTitulo("Actualizar Titulo");
         // Llamamos al método updateTareaById que hará la actualización del título
-        Tarea tareaActualizada = tareaService.updateTareaById(1L, tarea);
+        Tarea tareaActualizada = tareaService.updateTarea(tarea);
         //
         verify(tareaRepository, times(1)).save(tarea);
         //
@@ -98,19 +96,6 @@ public class TareaServiceTest {
         tareaService.deleteTareaById(1L);
         //
         verify(tareaRepository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    public void testCreateTareaWithInvalidData() {
-        //
-        Tarea tarea = new Tarea();
-        //
-        Exception exception = assertThrows(InvalidTareaDataException.class, () -> tareaService.saveTarea(tarea));
-        //
-        String expectedMessage = "El titulo de la tarea es requerido.";
-        String actualMessage = exception.getMessage();
-        //
-        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     /**

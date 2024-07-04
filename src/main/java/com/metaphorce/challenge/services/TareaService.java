@@ -1,17 +1,13 @@
 package com.metaphorce.challenge.services;
 
-import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
-import com.metaphorce.challenge.exceptions.TareaNotFoudException;
 import com.metaphorce.challenge.models.Tarea;
 import com.metaphorce.challenge.repositories.TareaRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -29,9 +25,6 @@ public class TareaService implements TareaServiceInterface {
     @Transactional
     @Override
     public Tarea saveTarea(Tarea tarea) {
-        if (tarea.getTitulo() == null || tarea.getTitulo().trim().isEmpty())
-            throw new InvalidTareaDataException("El titulo de la tarea es requerido.");
-
         return tareaRepository.save(tarea);
     }
 
@@ -58,21 +51,7 @@ public class TareaService implements TareaServiceInterface {
      */
     @Transactional
     @Override
-    public Tarea updateTareaById(Long id, Tarea tarea) {
-        Tarea existingTarea = tareaRepository.findById(id).orElse(null);
-        if (existingTarea == null) {
-            throw new TareaNotFoudException("No se encontró la tarea con el ID proporcionado.", "DB-404", HttpStatus.NOT_FOUND);
-        }
-
-        if (tarea.getTitulo() == null || tarea.getTitulo().trim().isEmpty())
-            throw new InvalidTareaDataException("El titulo de la tarea es requerido.");
-
-        existingTarea.setTitulo(tarea.getTitulo());
-        existingTarea.setDescripcion(tarea.getDescripcion());
-        existingTarea.setEstado(tarea.getEstado());
-        existingTarea.setFechaVencimiento(tarea.getFechaVencimiento());
-        existingTarea.setUpdatedAt(new Date());
-
+    public Tarea updateTarea(Tarea tarea) {
         return tareaRepository.save(tarea);
     }
 

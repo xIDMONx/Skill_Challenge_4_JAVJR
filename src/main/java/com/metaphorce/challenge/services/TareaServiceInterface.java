@@ -29,13 +29,12 @@ public interface TareaServiceInterface {
     List<Tarea> getAllTareas();
 
     /**
-     * Actualiza una Tarea en el repositorio por su ID.
+     * Actualiza una Tarea en el repositorio.
      *
-     * @param id el ID de la Tarea a actualizar
      * @param tarea el objeto Tarea actualizado
      * @return el objeto Tarea actualizado
      */
-    Tarea updateTareaById(Long id, Tarea tarea);
+    Tarea updateTarea(Tarea tarea);
 
     /**
      * Elimina una tarea del repositorio por su ID.

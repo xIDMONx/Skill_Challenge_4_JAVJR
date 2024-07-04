@@ -108,7 +108,7 @@ public class TareaController {
 
         existingTarea.setUpdatedAt(new Date());
 
-        return new ResponseEntity<>(tareaService.updateTareaById(id, existingTarea), HttpStatus.OK);
+        return new ResponseEntity<>(tareaService.updateTarea(existingTarea), HttpStatus.OK);
     }
 
     /**
