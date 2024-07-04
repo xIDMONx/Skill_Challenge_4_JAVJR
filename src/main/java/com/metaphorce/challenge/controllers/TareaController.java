@@ -2,6 +2,7 @@ package com.metaphorce.challenge.controllers;
 
 import com.metaphorce.challenge.exceptions.TareaNotFoudException;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -20,14 +21,8 @@ import java.util.Objects;
 @RequestMapping("/api/tarea")
 public class TareaController {
 
-    private final TareaService tareaService;
-
-    /**
-     * La clase TareaController es responsable de manejar solicitudes HTTP relacionadas con objetos Tarea.
-     */
-    public TareaController(TareaService tareaService) {
-        this.tareaService = tareaService;
-    }
+    @Autowired
+    TareaService tareaService;
 
     /**
      * Crea una nueva Tarea.
@@ -70,7 +65,7 @@ public class TareaController {
     public ResponseEntity<Tarea> getTareaById(@PathVariable Long id) {
         Tarea tarea = tareaService.getTareaById(id);
         if (tarea == null) {
-            throw new TareaNotFoudException("Tarea no encontrada", "DB-404", HttpStatus.NOT_FOUND);
+            throw new TareaNotFoudException("Tarea no encontrada. [" + id + "]", "DB-404", HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(tarea);
     }
@@ -85,30 +80,30 @@ public class TareaController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Tarea> updateTarea(@PathVariable Long id, @RequestBody Tarea updateTarea) {
-        Tarea existingTarea = tareaService.getTareaById(id);
-        if (existingTarea == null) {
-            throw new TareaNotFoudException("Tarea no encontrada", "DB-404", HttpStatus.NOT_FOUND);
+        Tarea tarea = tareaService.getTareaById(id);
+        if (tarea == null) {
+            throw new TareaNotFoudException("Tarea no encontrada. [" + id + "]", "DB-404", HttpStatus.NOT_FOUND);
         }
-
+        //
         if (updateTarea.getTitulo() != null && !updateTarea.getTitulo().isEmpty()) {
-            existingTarea.setTitulo(updateTarea.getTitulo());
+            tarea.setTitulo(updateTarea.getTitulo());
         }
-
+        //
         if (updateTarea.getDescripcion() != null && !updateTarea.getDescripcion().isEmpty()) {
-            existingTarea.setDescripcion(updateTarea.getDescripcion());
+            tarea.setDescripcion(updateTarea.getDescripcion());
         }
-
+        //
         if (updateTarea.getEstado() != null) {
-            existingTarea.setEstado(updateTarea.getEstado());
+            tarea.setEstado(updateTarea.getEstado());
         }
-
+        //
         if (updateTarea.getFechaVencimiento() != null) {
-            existingTarea.setFechaVencimiento(updateTarea.getFechaVencimiento());
+            tarea.setFechaVencimiento(updateTarea.getFechaVencimiento());
         }
-
-        existingTarea.setUpdatedAt(new Date());
-
-        return new ResponseEntity<>(tareaService.updateTarea(existingTarea), HttpStatus.OK);
+        //
+        tarea.setUpdatedAt(new Date());
+        //
+        return new ResponseEntity<>(tareaService.updateTarea(tarea), HttpStatus.OK);
     }
 
     /**
@@ -120,11 +115,12 @@ public class TareaController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTarea(@PathVariable Long id) {
-        if (tareaService.getTareaById(id) != null) {
-            tareaService.deleteTareaById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (tareaService.getTareaById(id) == null) {
+            throw new TareaNotFoudException("Tarea no encontrada. [" + id + "]", "DB-404", HttpStatus.NOT_FOUND);
         }
+        //
+        tareaService.deleteTareaById(id);
+        //
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
