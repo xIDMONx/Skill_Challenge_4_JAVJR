@@ -2,13 +2,9 @@ package com.metaphorce.challenge.controllers;
 
 import com.metaphorce.challenge.exceptions.TareaNotFoudException;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.validation.ObjectError;
-import org.springframework.validation.Validator;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,8 +15,6 @@ import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tarea")
@@ -114,7 +108,7 @@ public class TareaController {
 
         existingTarea.setUpdatedAt(new Date());
 
-        return new ResponseEntity<>(tareaService.updateTarea(existingTarea), HttpStatus.OK);
+        return new ResponseEntity<>(tareaService.updateTareaById(id, existingTarea), HttpStatus.OK);
     }
 
     /**
@@ -127,7 +121,7 @@ public class TareaController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTarea(@PathVariable Long id) {
         if (tareaService.getTareaById(id) != null) {
-            tareaService.deleteTarea(id);
+            tareaService.deleteTareaById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
