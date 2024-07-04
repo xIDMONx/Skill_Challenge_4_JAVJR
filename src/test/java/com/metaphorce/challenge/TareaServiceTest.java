@@ -72,16 +72,18 @@ public class TareaServiceTest {
 
     @Test
     public void testUpdateTarea() {
-        //
+        // Creamos una nueva instancia de Tarea
         Tarea tarea = new Tarea();
-        //
+        // Asignamos algunas propiedades
         tarea.setId(1L);
         tarea.setTitulo("Test Titulo");
-        //
+        // Simulamos la búsqueda y retornamos la tarea que acabamos de crear
         when(tareaRepository.findById(1L)).thenReturn(Optional.of(tarea));
+        // Llamamos al método save y retornamos la tarea
         when(tareaRepository.save(any(Tarea.class))).thenReturn(tarea);
-        //
+        // Actualizamos el título
         tarea.setTitulo("Actualizar Titulo");
+        // Llamamos al método updateTareaById que hará la actualización del título
         Tarea tareaActualizada = tareaService.updateTareaById(1L, tarea);
         //
         verify(tareaRepository, times(1)).save(tarea);
