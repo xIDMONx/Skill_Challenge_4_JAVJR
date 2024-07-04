@@ -82,7 +82,7 @@ public class TareaServiceTest {
         when(tareaRepository.save(any(Tarea.class))).thenReturn(tarea);
         //
         tarea.setTitulo("Actualizar Titulo");
-        Tarea tareaActualizada = tareaService.updateTarea(tarea);
+        Tarea tareaActualizada = tareaService.updateTareaById(1L, tarea);
         //
         verify(tareaRepository, times(1)).save(tarea);
         //
@@ -93,7 +93,7 @@ public class TareaServiceTest {
     public void testDeleteTarea() {
         willDoNothing().given(tareaRepository).deleteById(1L);
         //
-        tareaService.deleteTarea(1L);
+        tareaService.deleteTareaById(1L);
         //
         verify(tareaRepository, times(1)).deleteById(1L);
     }
