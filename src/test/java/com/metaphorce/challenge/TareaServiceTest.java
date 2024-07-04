@@ -1,6 +1,5 @@
 package com.metaphorce.challenge;
 
-import com.metaphorce.challenge.exceptions.InvalidTareaDataException;
 import com.metaphorce.challenge.models.Tarea;
 import com.metaphorce.challenge.repositories.TareaRepository;
 import com.metaphorce.challenge.services.TareaService;
@@ -24,9 +23,9 @@ import static org.mockito.Mockito.*;
 public class TareaServiceTest {
 
     @InjectMocks
-    private TareaService tareaService;
+    TareaService tareaService;
     @Mock
-    private TareaRepository tareaRepository;
+    TareaRepository tareaRepository;
 
     @BeforeEach
     public void setUp() {

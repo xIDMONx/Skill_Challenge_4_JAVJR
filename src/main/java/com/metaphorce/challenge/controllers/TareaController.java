@@ -32,13 +32,17 @@ public class TareaController {
      */
     @PostMapping
     public ResponseEntity<Tarea> createTarea(@Valid @RequestBody Tarea tarea, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new InvalidTareaDataException(
-                    Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage(),
-                    "INVALID_TAREA_DATA",
-                    HttpStatus.BAD_REQUEST,
-                    bindingResult
-            );
+        if (tarea.getTitulo() == null || tarea.getTitulo().isEmpty()) {
+            throw new InvalidTareaDataException("El titulo de la tarea es requerido.", "INVALIDAD_TAREA_DATA", HttpStatus.BAD_REQUEST);
+        }
+        if (tarea.getDescripcion() == null || tarea.getDescripcion().isEmpty()) {
+            throw new InvalidTareaDataException("La descripción de la tarea es requerido.", "INVALIDAD_TAREA_DATA", HttpStatus.BAD_REQUEST);
+        }
+        if (tarea.getEstado() == null || tarea.getEstado().isEmpty()) {
+            throw new InvalidTareaDataException("El estado de la tarea es requerido.", "INVALIDAD_TAREA_DATA", HttpStatus.BAD_REQUEST);
+        }
+        if (tarea.getFechaVencimiento() == null) {
+            throw new InvalidTareaDataException("La fecha de vencimiento de la tarea es requerida.", "INVALIDAD_TAREA_DATA", HttpStatus.BAD_REQUEST);
         }
 
         return new ResponseEntity<>(tareaService.saveTarea(tarea), HttpStatus.CREATED);
@@ -73,7 +77,7 @@ public class TareaController {
     /**
      * Actualiza una Tarea por el ID dado.
      *
-     * @param id el ID de la Tarea a actualizar
+     * @param id          el ID de la Tarea a actualizar
      * @param updateTarea el objeto Tarea que contiene los valores actualizados
      * @return a ResponseEntity que contiene la Tarea actualizada si existe, en caso contrario se devolverá una
      * respuesta HTTP 404 NOT FOUND
